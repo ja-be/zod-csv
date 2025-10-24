@@ -3,7 +3,7 @@ import { z } from "zod";
 /**
  * Extract schema keys from a Zod type
  */
-export const zodKeys = <T extends z.ZodTypeAny>(schema: T): string[] => {
+export const zodKeys = (schema: any): string[] => {
     if (schema === null || schema === undefined) return [];
     if (schema instanceof z.ZodNullable || schema instanceof z.ZodOptional) return zodKeys(schema.unwrap());
     if (schema instanceof z.ZodArray) return zodKeys(schema.element);
@@ -14,9 +14,9 @@ export const zodKeys = <T extends z.ZodTypeAny>(schema: T): string[] => {
             return nested.length ? nested : key;
         });
     }
-    if (schema instanceof z.ZodEffects) {
-        const innerType = schema.innerType();
-        if (!innerType.shape) return zodKeys(innerType);
+    if (schema instanceof z.ZodTransform) {
+        const innerType = (schema as any)._def.schema;
+        if (!innerType || !('shape' in innerType)) return zodKeys(innerType);
         const entries = Object.entries(innerType.shape);
         return entries.flatMap(([key, value]) => {
             const nested = value instanceof z.ZodType ? zodKeys(value).map(subKey => `${key}.${subKey}`) : [];
@@ -29,7 +29,7 @@ export const zodKeys = <T extends z.ZodTypeAny>(schema: T): string[] => {
 /**
  * Get headers from a Zod schema
  */
-export const getHeadersFromSchema = <T extends z.ZodTypeAny>(schema: T): string[] => {
+export const getHeadersFromSchema = (schema: any): string[] => {
     return zodKeys(schema).map(header => header.trim());
 }
 

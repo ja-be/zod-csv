@@ -13,7 +13,7 @@ const ERROR_CODES = {
 }
 
 const JOINER = ", ";
-const getCSVHeaderErrors = <T extends z.ZodTypeAny>(csvContent: string, schema: T, options?: Options) => {
+const getCSVHeaderErrors = (csvContent: string, schema: any, options?: Options) => {
     const expectedHeaders = getHeadersFromSchema(schema)
     const csvHeaders = getHeadersFromContent(csvContent, options)
     if (!csvHeaders.length) {
@@ -32,7 +32,7 @@ const getCSVHeaderErrors = <T extends z.ZodTypeAny>(csvContent: string, schema: 
     return {} as const
 }
 
-const getCSVBodyErrors = <T extends z.ZodTypeAny>(csvContent: string, schema: T, options?: Options) => {
+const getCSVBodyErrors = <T extends z.ZodType>(csvContent: string, schema: T, options?: Options) => {
     const validRows: z.infer<T>[] = [];
     const rows = getRowsFromContent(csvContent, schema, options);
     const errors = rows.reduce((errors, row, index) => {
@@ -43,11 +43,11 @@ const getCSVBodyErrors = <T extends z.ZodTypeAny>(csvContent: string, schema: T,
             validRows.push(parsed.data);
         }
         return errors;
-    }, {} as Record<string, z.ZodError<T>>);
+    }, {} as Record<string, z.ZodError<z.output<T>>>);
     return [validRows, errors] as const
 }
 
-const getCSVErrorsAndValidRows = <T extends z.ZodTypeAny>(csvContent: string, schema: T, options?: Options) => {
+const getCSVErrorsAndValidRows = <T extends z.ZodType>(csvContent: string, schema: T, options?: Options) => {
     const [validRows, rows] = getCSVBodyErrors(csvContent, schema, options);
     const header = getCSVHeaderErrors(csvContent, schema);
 
@@ -66,7 +66,7 @@ const getCSVErrorsAndValidRows = <T extends z.ZodTypeAny>(csvContent: string, sc
     ] as const
 }
 
-const getRowsFromContent = <T extends z.ZodType>(csvContent: string, schema: T, options?: Options) => {
+const getRowsFromContent = (csvContent: string, schema: any, options?: Options) => {
     const headersFromSchema = getHeadersFromSchema(schema)
     return extractRows(csvContent, options).map((cells) => {
         return headersFromSchema.reduce((row, header, index) => {
@@ -103,7 +103,7 @@ type ResultCSV<T extends z.ZodType> = {
     validRows: z.infer<T>[],
     errors: {
         header?: { errorCode: keyof typeof ERROR_CODES['HEADER'], header: string },
-        rows?: Record<string, z.ZodError<T>>
+        rows?: Record<string, z.ZodError<z.output<T>>>
     }
 }
 
@@ -166,7 +166,7 @@ type ResultRow<T extends z.ZodType> = {
     row: z.infer<T>,
 } | {
     success: false,
-    errors: z.ZodError<T>[]
+    errors: z.ZodError<z.output<T>>[]
 }
 
 /**

@@ -18,7 +18,7 @@ export default defineConfig({
             formats: ['es', 'cjs', 'umd']
         },
         rollupOptions: {
-            external: ['zod'],
+            external: ["events", "stream", 'zod'],
         }
     },
     plugins: [

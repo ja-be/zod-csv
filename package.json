@@ -38,7 +38,7 @@
     "test:cjs": "node --test test-imports/node-cjs-require.test.cjs"
   },
   "peerDependencies": {
-    "zod": "^3.11.x"
+    "zod": "^4.1.x"
   },
   "devDependencies": {
     "@types/node": "^20.3.1",
@@ -47,7 +47,7 @@
     "vite-plugin-dts": "^2.3.0",
     "vite-plugin-node-polyfills": "^0.23.0",
     "vitest": "^0.32.2",
-    "zod": "^3.21.4"
+    "zod": "^4.1.12"
   },
   "dependencies": {
     "csv-string": "^4.1.1"

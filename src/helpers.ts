@@ -1,15 +1,15 @@
-import { z, ZodBoolean, ZodDate, ZodEffects, ZodEnum, ZodNumber, ZodString, ZodTypeAny } from "zod";
+import { z, ZodBoolean, ZodDate, ZodEnum, ZodNumber, ZodString, ZodType } from "zod";
 
-type InputType<DefaultType extends ZodTypeAny> = {
-    (): ZodEffects<DefaultType>;
-    <ProvidedType extends ZodTypeAny>(
+type InputType<DefaultType extends ZodType> = {
+    (): DefaultType;
+    <ProvidedType extends ZodType>(
         schema: ProvidedType
-    ): ZodEffects<ProvidedType>;
+    ): ProvidedType;
 };
 
 const stripEmpty = z.literal("").transform(() => undefined);
 
-const preprocessIfValid = (schema: ZodTypeAny) => (val: unknown) => {
+const preprocessIfValid = (schema: ZodType) => (val: unknown) => {
     const result = schema.safeParse(val);
     if (result.success) return result.data;
     return val;
@@ -61,8 +61,8 @@ export const date: InputType<ZodDate> = (schema = z.date()) =>
     ) as any;
 
 
-export const enum_: InputType<ZodEnum<[string, ...string[]]>> = (schema = z.enum([""])) => {
-    const enumValues = schema._def.values;
+export const enum_: InputType<ZodEnum<any>> = (schema = z.enum([""] as const)) => {
+    const enumValues = schema.options;
     const enumKeys = Object.keys(enumValues);
     // @ts-expect-error we are using enumValues's keys so this is fine
     const enumValuesArray = enumKeys.map((key) => enumValues[key]);
