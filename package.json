@@ -35,7 +35,8 @@
     "watch": "vitest --watch",
     "test:imports": "npm run test:esm && npm run test:cjs",
     "test:esm": "node --test test-imports/node-esm-import.test.js",
-    "test:cjs": "node --test test-imports/node-cjs-require.test.cjs"
+    "test:cjs": "node --test test-imports/node-cjs-require.test.cjs",
+    "prepare": "pnpm build"
   },
   "peerDependencies": {
     "zod": "^4.1.x"
