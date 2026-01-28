@@ -7,7 +7,7 @@ export type Options = {
     skipEmptyLines?: boolean,
 }
 
-const skipEmptyLines = <T extends string>(rows: T[][]) => rows.filter((row) => row.every(cell => cell.length));
+const skipEmptyLines = <T extends string>(rows: T[][]) => rows.filter((row) => row.some(cell => cell.length > 0));
 
 export const extractHeadersFromContent = (csvContent: string, options?: Options): string[] => {
     const [headers] = csv.parse(csvContent, options);
